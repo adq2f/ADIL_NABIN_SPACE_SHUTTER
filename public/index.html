@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Space Shooter Multiplayer</title>
   <link rel="stylesheet" href="style.css" />
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
 </head>
 <body>
-  <!-- MENU -->
+  <!-- MENU SCREEN -->
   <div id="menu">
     <h1>🚀 SPACE SHOOTER</h1>
     <input id="playerName" placeholder="Tomar naam" maxlength="12" />
@@ -23,7 +24,7 @@
     <p id="menuMsg"></p>
   </div>
 
-  <!-- LOBBY -->
+  <!-- LOBBY SCREEN -->
   <div id="lobby" class="hidden">
     <h2>Room: <span id="roomIdShow"></span></h2>
     <p>Mode: <span id="modeShow"></span></p>
@@ -31,7 +32,7 @@
     <button id="startBtn" class="hidden">START GAME</button>
   </div>
 
-  <!-- GAME OVER -->
+  <!-- GAME OVER SCREEN -->
   <div id="gameOver" class="hidden">
     <h1>GAME OVER</h1>
     <p id="finalScore"></p>
