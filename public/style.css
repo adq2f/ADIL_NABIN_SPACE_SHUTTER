@@ -1,0 +1,93 @@
+* { 
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box; 
+  font-family: 'Arial', sans-serif; 
+}
+
+body {
+  background: #000011;
+  color: #fff;
+  overflow: hidden;
+  height: 100vh;
+}
+
+#menu, #lobby, #gameOver {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 100;
+  background: rgba(0, 0, 30, 0.9);
+  padding: 40px;
+  border-radius: 15px;
+  border: 2px solid #00ffff;
+  box-shadow: 0 0 30px #00ffff88;
+  min-width: 350px;
+}
+
+h1, h2 { 
+  color: #00ffff; 
+  margin-bottom: 20px; 
+  text-shadow: 0 0 10px #00ffff; 
+}
+
+input {
+  padding: 10px;
+  margin: 8px 0;
+  border: 2px solid #00ffff;
+  background: #001122;
+  color: #fff;
+  border-radius: 5px;
+  width: 100%;
+  font-size: 16px;
+  text-align: center;
+}
+
+button {
+  padding: 12px 25px;
+  margin: 8px 5px;
+  border: none;
+  background: linear-gradient(45deg, #00ffff, #0088ff);
+  color: #000;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover { 
+  transform: scale(1.05); 
+  box-shadow: 0 0 20px #00ffff; 
+}
+
+.btn-group { 
+  display: flex; 
+  gap: 10px; 
+  justify-content: center; 
+  margin: 15px 0; 
+}
+
+#joinSection { 
+  margin-top: 20px; 
+  display: flex; 
+  gap: 10px; 
+  align-items: center; 
+}
+
+#menuMsg { 
+  color: #ff4444; 
+  margin-top: 15px; 
+  min-height: 20px; 
+}
+
+.hidden { 
+  display: none !important; 
+}
+
+canvas { 
+  display: block; 
+  margin: 0 auto; 
+}
