@@ -12,7 +12,7 @@ const io = new Server(server, {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Room store
-const rooms = {}; // { roomId: { players: {socketId: {x,y,score,hp,name}}, mode, enemies, host } }
+const rooms = {};
 
 function generateRoomId() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -25,7 +25,7 @@ io.on('connection', (socket) => {
   socket.on('createRoom', ({ name, mode }) => {
     const roomId = generateRoomId();
     rooms[roomId] = {
-      mode, // 'coop' or 'pvp'
+      mode,
       host: socket.id,
       players: {
         [socket.id]: {
@@ -72,6 +72,14 @@ io.on('connection', (socket) => {
     io.to(roomId).emit('playersUpdate', room.players);
   });
 
+  // START GAME — host theke
+  socket.on('startGame', ({ roomId }) => {
+    const room = rooms[roomId];
+    if (!room) return;
+    if (room.host !== socket.id) return;
+    io.to(roomId).emit('gameStarted');
+  });
+
   // Player movement
   socket.on('playerMove', ({ x, y }) => {
     const room = rooms[socket.roomId];
@@ -115,7 +123,6 @@ io.on('connection', (socket) => {
     if (target.hp <= 0) {
       target.hp = 0;
       target.alive = false;
-      // Respawn after 3 sec
       setTimeout(() => {
         if (room.players[targetId]) {
           room.players[targetId].hp = 100;
