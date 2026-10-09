@@ -5,7 +5,7 @@ let myRoomId = '';
 let myMode = '';
 let isHost = false;
 
-// CREATE ROOM
+// ----- MENU BUTTONS -----
 document.getElementById('coopBtn').onclick = () => createRoom('coop');
 document.getElementById('pvpBtn').onclick = () => createRoom('pvp');
 
@@ -14,7 +14,6 @@ function createRoom(mode) {
   socket.emit('createRoom', { name: myName, mode });
 }
 
-// JOIN ROOM
 document.getElementById('joinBtn').onclick = () => {
   myName = document.getElementById('playerName').value.trim() || 'Player';
   const roomId = document.getElementById('roomCode').value.trim();
@@ -25,7 +24,7 @@ document.getElementById('joinBtn').onclick = () => {
   socket.emit('joinRoom', { name: myName, roomId });
 };
 
-// ROOM CREATED
+// ----- ROOM EVENTS -----
 socket.on('roomCreated', ({ roomId, mode }) => {
   myRoomId = roomId;
   myMode = mode;
@@ -33,7 +32,6 @@ socket.on('roomCreated', ({ roomId, mode }) => {
   showLobby(roomId, mode);
 });
 
-// ROOM JOINED
 socket.on('roomJoined', ({ roomId, mode }) => {
   myRoomId = roomId;
   myMode = mode;
@@ -54,7 +52,7 @@ function showLobby(roomId, mode) {
   }
 }
 
-// PLAYERS UPDATE
+// ----- PLAYERS UPDATE -----
 socket.on('playersUpdate', (players) => {
   const count = Object.keys(players).length;
   if (count >= 2 && isHost) {
@@ -62,7 +60,7 @@ socket.on('playersUpdate', (players) => {
   }
 });
 
-// START GAME
+// ----- START GAME -----
 document.getElementById('startBtn').onclick = () => {
   socket.emit('startGame', { roomId: myRoomId });
 };
@@ -72,16 +70,16 @@ socket.on('gameStarted', () => {
   if (window.startGame) window.startGame();
 });
 
-// ERRORS
+// ----- ERRORS -----
 socket.on('errorMsg', (msg) => {
   document.getElementById('menuMsg').textContent = msg;
 });
 
-// PLAYER LEFT
+// ----- PLAYER LEFT -----
 socket.on('playerLeft', () => {
   alert('Onno player chole gese! Menu te fire jao.');
   location.reload();
 });
 
-// RESTART
+// ----- RESTART -----
 document.getElementById('restartBtn').onclick = () => location.reload();
