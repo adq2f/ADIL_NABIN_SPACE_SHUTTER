@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Space Shooter Multiplayer</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+</head>
+<body>
+  <!-- MENU -->
+  <div id="menu">
+    <h1>🚀 SPACE SHOOTER</h1>
+    <input id="playerName" placeholder="Tomar naam" maxlength="12" />
+    <div class="btn-group">
+      <button id="coopBtn">🤝 CO-OP</button>
+      <button id="pvpBtn">⚔️ PVP</button>
+    </div>
+    <div id="joinSection">
+      <input id="roomCode" placeholder="Room Code" maxlength="6" />
+      <button id="joinBtn">JOIN</button>
+    </div>
+    <p id="menuMsg"></p>
+  </div>
+
+  <!-- LOBBY -->
+  <div id="lobby" class="hidden">
+    <h2>Room: <span id="roomIdShow"></span></h2>
+    <p>Mode: <span id="modeShow"></span></p>
+    <p id="waitMsg">Waiting for player 2...</p>
+    <button id="startBtn" class="hidden">START GAME</button>
+  </div>
+
+  <!-- GAME OVER -->
+  <div id="gameOver" class="hidden">
+    <h1>GAME OVER</h1>
+    <p id="finalScore"></p>
+    <button id="restartBtn">Back to Menu</button>
+  </div>
+
+  <script src="socket.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
