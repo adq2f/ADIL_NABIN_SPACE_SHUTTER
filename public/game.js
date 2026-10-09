@@ -8,13 +8,14 @@ let enemies;
 let cursors;
 let wasd;
 let spaceKey;
-let enemiesGroup;
-let lastEnemySpawn = 0;
+let lastSend = 0;
 let gameRunning = false;
 
-// START GAME (called from socket.js)
+// START GAME — socket.js theke call hobe
 window.startGame = function () {
+  if (gameRunning) return;
   gameRunning = true;
+
   const config = {
     type: Phaser.AUTO,
     width: 800,
@@ -31,15 +32,16 @@ window.startGame = function () {
 };
 
 function preload() {
-  // textures generate korbo create e
+  // textures create e generate hobe
 }
 
 function create() {
   scene = this;
 
-  // ----- Generate Textures -----
-  // Player ship (green triangle)
+  // ----- Textures Generate -----
   const g = this.add.graphics();
+
+  // Player ship (green triangle)
   g.fillStyle(0x00ff00, 1);
   g.fillTriangle(20, 0, 0, 40, 40, 40);
   g.generateTexture('ship', 40, 40);
@@ -55,18 +57,15 @@ function create() {
   g.fillStyle(0xffff00, 1);
   g.fillRect(0, 0, 4, 12);
   g.generateTexture('bullet', 4, 12);
-  g.clear();
   g.destroy();
 
   // ----- My Player -----
   myPlayer = this.physics.add.sprite(400, 500, 'ship');
   myPlayer.setCollideWorldBounds(true);
 
-  // ----- Bullets -----
+  // ----- Groups -----
   bullets = this.physics.add.group();
   enemyBullets = this.physics.add.group();
-
-  // ----- Enemies -----
   enemies = this.physics.add.group();
 
   // ----- Input -----
@@ -74,7 +73,7 @@ function create() {
   wasd = this.input.keyboard.addKeys('W,A,S,D');
   spaceKey = this.input.keyboard.addKey('SPACE');
 
-  // ----- Player fire -----
+  // ----- Fire -----
   this.input.keyboard.on('keydown-SPACE', () => {
     if (!myPlayer.active) return;
     const b = bullets.create(myPlayer.x, myPlayer.y - 25, 'bullet');
@@ -82,13 +81,12 @@ function create() {
     socket.emit('fireBullet', { x: myPlayer.x, y: myPlayer.y });
   });
 
-  // ----- Socket listeners for game events -----
+  // ----- Socket Listeners -----
   socket.on('playerMoved', ({ id, x, y }) => {
     if (otherPlayers[id]) {
       otherPlayers[id].x = x;
       otherPlayers[id].y = y;
     } else {
-      // Create other player sprite (different color - blue)
       const other = scene.physics.add.sprite(x, y, 'ship');
       other.setTint(0x00aaff);
       otherPlayers[id] = other;
@@ -109,11 +107,10 @@ function create() {
   });
 
   socket.on('playersUpdate', (players) => {
-    // Update HP/score display
     updateHUD(players);
   });
 
-  // ----- Collision: my bullets vs enemies -----
+  // ----- Collisions -----
   this.physics.add.overlap(bullets, enemies, (bullet, enemy) => {
     bullet.destroy();
     enemy.hp -= 1;
@@ -124,7 +121,6 @@ function create() {
     }
   });
 
-  // ----- Collision: enemy bullets vs me (PvP) -----
   if (myMode === 'pvp') {
     this.physics.add.overlap(enemyBullets, myPlayer, (bullet, player) => {
       bullet.destroy();
@@ -132,7 +128,6 @@ function create() {
     });
   }
 
-  // ----- Collision: enemies vs me -----
   this.physics.add.overlap(myPlayer, enemies, (player, enemy) => {
     enemy.destroy();
     if (myMode === 'pvp') {
@@ -140,7 +135,7 @@ function create() {
     }
   });
 
-  // ----- Start enemy spawner (only host) -----
+  // ----- Enemy Spawner (host only) -----
   if (isHost) {
     this.time.addEvent({
       delay: 1500,
@@ -162,7 +157,7 @@ function create() {
     });
   }
 
-  // HUD text
+  // ----- HUD -----
   this.hudText = this.add.text(10, 10, 'HP: 100 | Score: 0', {
     fontSize: '18px',
     color: '#00ffff'
@@ -171,7 +166,7 @@ function create() {
 
 function updateHUD(players) {
   const me = players[socket.id];
-  if (me) {
+  if (me && scene && scene.hudText) {
     scene.hudText.setText(`HP: ${me.hp} | Score: ${me.score}`);
     if (me.hp <= 0 && myPlayer.active) {
       myPlayer.setActive(false).setVisible(false);
@@ -186,7 +181,6 @@ function updateHUD(players) {
 function update() {
   if (!myPlayer || !myPlayer.active) return;
 
-  // Movement
   const speed = 300;
   let vx = 0, vy = 0;
   if (cursors.left.isDown || wasd.A.isDown) vx = -speed;
@@ -196,21 +190,14 @@ function update() {
 
   myPlayer.setVelocity(vx, vy);
 
-  // Send position to server (throttle)
-  if (this.time.now - lastEnemySpawn > 50) {
+  // Throttled position send
+  if (this.time.now - lastSend > 50) {
     socket.emit('playerMove', { x: myPlayer.x, y: myPlayer.y });
-    lastEnemySpawn = this.time.now;
+    lastSend = this.time.now;
   }
 
   // Cleanup offscreen
   bullets.children.each(b => { if (b.y < -20) b.destroy(); });
   enemyBullets.children.each(b => { if (b.y < -20) b.destroy(); });
-  enemies.children.each(e => {
-    if (e.y > 620) {
-      e.destroy();
-      if (myMode === 'pvp') {
-        // Miss — no penalty
-      }
-    }
-  });
+  enemies.children.each(e => { if (e.y > 620) e.destroy(); });
 }
